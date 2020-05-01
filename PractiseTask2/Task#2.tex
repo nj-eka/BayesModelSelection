@@ -1,0 +1,119 @@
+\documentclass[12pt, twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\newcommand{\hdir}{.}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{euscript}
+\usepackage{upgreek}
+\usepackage{array}
+\usepackage{theorem}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{url}
+\usepackage{amsmath, bm}
+
+\usepackage{cancel}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm, bindingoffset=0cm]{geometry}
+
+\newcommand{\Pb}{\mathcal{P}}
+
+\setcounter{secnumdepth}{-1}
+
+\begin{document} 
+
+\title{Практическое задание 2 по курсу "Байесовский выбор модели"}
+\author{Грабовой Андрей, группа 574}
+\date{}
+\maketitle
+
+\section{Задача}
+Пусть имеем следующую общую модель:
+$$P_i = \textbf{w}^{\mathsf{T}}_{k_i}\textbf{x}_i + b_{k_i} + \varepsilon_i, \eqno(1)$$
+где $k_i \in [1,\cdots, K]$.  То есть имеем $K$ моделей и каждый объект описывается какой-то одной из них. Каждая модель $M_k$ задается своим вектором параметром $\textbf{w}_k$ и сдвигом $b_k$
+
+
+Пусть имеется выборка $(\textbf{X}, \textbf{p}) = \{(\textbf{x}_i, P_i)\}_{i=1}^{m}$. Пусть $K$ --- оценка сверху на обшее количество поставщиков. В качестве априорного распределения на $\bm{\pi}$ введем:
+$$p(\bm{\pi}|\mu) = \text{Dir}(\bm{\pi}|\mu\textbf{e}). \eqno(2)$$ 
+Пусть введены априорное распределения на каждую модель:
+$$p(\textbf{w}_k) = N(\textbf{w}_k|\textbf{0}, \textbf{A}_k), \eqno(3)$$
+где $\textbf{A}_k$ --- диагональная коввариационная матрица для $k$-й модели. Также введено априорное распределение на шум $\varepsilon_i \sim N(0, \beta^{-1})$.
+
+Обозначим $\textbf{W} = [\textbf{w}_1, \textbf{w}_2, \cdots, \textbf{w}_K]$, $\textbf{A} = [\textbf{A}_1, \textbf{A}_2, \cdots, \textbf{A}_K]$,  $\textbf{b} = [b_1, b_2, \cdots, b_K]$.
+
+\paragraph{1.} Совместное правдоподобие выглядит следующим образом:
+$$p(\textbf{p}, \textbf{W}, \bm{\pi}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) = \text{Dir}(\bm{\pi}|\mu\textbf{e})\prod_{k=1}^{K}N(\textbf{w}_k|\textbf{0}, \textbf{A}_k)\prod_{i=1}^{m}\left(\sum_{j=1}^{K}\pi_kN(P_i|b_k + \textbf{w}_k^{\mathsf{T}}\textbf{x}_i, \beta^{-1})\right). \eqno(4)$$
+
+\paragraph{2.} Апостериорное распределение пропорционально:
+$$p(\textbf{W}, \bm{\pi}|\textbf{X}, \textbf{p}, \textbf{A}, \textbf{b}, \beta, \mu) \propto \prod_{i=1}^{m}\left(\sum_{j=1}^{K}\pi_j\exp\left(-\frac{\beta}{2}\left[P_i-\textbf{w}_j^{\mathsf{T}}\textbf{x}_i-b_j\right]^2\right)\right)\prod_{k=1}^{K}\pi_k^{\mu-1}\exp\left(-\frac{1}{2}\textbf{w}_k^{\mathsf{T}}\textbf{A}_k\textbf{w}_k\right), \eqno(5)$$
+как видно с формулы (5) в силу того, что у нас под знаком произведения стоит сумма которая зависит и от $\textbf{w}$ и от $\pi$, мы попросту не можем разделить эти две плотности, чтобы посчитать апостериорное распределение.
+
+\paragraph{3.} Введем скрытые переменные $\textbf{Z} = ||z_{ik}||$, тогда совместное правдоподобие будет иметь вид:
+$$p(\textbf{p}, \textbf{W}, \bm{\pi}, \textbf{Z}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) = \text{Dir}(\bm{\pi}|\mu\textbf{e})\prod_{k=1}^{K}N(\textbf{w}_k|\textbf{0}, \textbf{A}_k)\prod_{i=1}^{m}\prod_{j=1}^{K}\left(\pi_jN(P_i|b_j+\textbf{w}_j^{\mathsf{T}}\textbf{x}_i, \beta^{-1})\right)^{z_{ij}}, \eqno(6)$$
+
+\paragraph{4.} Используем вариационное приближение:
+$$q(\bm{\pi}, \textbf{W}, \textbf{Z}) = q(\bm{\pi})q(\textbf{W})q(\textbf{Z}). \eqno(7)$$
+
+$$\log q(\bm{\pi}) = \mathsf{E}_{q/\pi}\log p(\textbf{p}, \textbf{W}, \bm{\pi}, \textbf{Z}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) \propto$$
+$$\propto \sum_{k=1}^{K}\log\pi_k\left(\mu-1 +\sum_{i=1}^{m}\mathsf{E}z_{ik}\right) \Rightarrow$$
+$$\Rightarrow q(\bm{\pi}) = \text{Dir}(\bm{\pi}|\mu\textbf{e}+\bm{\gamma}), \eqno(8)$$
+где $\gamma_k = \sum_{i=1}^{m}z_{ik}$.
+
+$$\log q(\textbf{W}) = \mathsf{E}_{q/W}\log p(\textbf{p}, \textbf{W}, \bm{\pi}, \textbf{Z}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) \propto$$
+$$ \propto \sum_{k=1}^{K}-\frac{1}{2}\left(\textbf{w}_k^{\mathsf{T}}\textbf{A}_k^{-1}\textbf{w}_k + \beta\sum_{i=1}^{m}\mathsf{E}z_{ik}\left[P_i - b_k -\textbf{w}_k^{\mathsf{T}}\textbf{x}_i\right]^2\right) \propto$$
+$$\propto -\frac{1}{2}\sum_{k=1}^{K}\left(\textbf{w}_k^{\mathsf{T}}\textbf{A}_k^{-1}\textbf{w}_k + \textbf{w}_k^{\mathsf{T}}\left[\beta\sum_{i=1}^{m}\textbf{x}_i\textbf{x}_i^{\mathsf{T}}\mathsf{E}z_{ik}\right]\textbf{w}_k -2\beta\textbf{w}_k^{\mathsf{T}}\left[\sum_{i=1}^{m}\textbf{x}_i\left(P_i-b_k\right)\mathsf{E}z_{ik}\right]\right) \propto$$
+$$-\frac{1}{2}\sum_{k=1}^{K}\left(\textbf{w}_k^{\mathsf{T}}\textbf{B}_k^{-1}\textbf{w}_k - 2\textbf{w}_k^{\mathsf{T}}\textbf{m}_k \right), \eqno(9)$$
+где введены обозначения:
+$$\textbf{B}_k = \left(\textbf{A}_k^{-1} + \beta\sum_{i=1}^{m}\textbf{x}_i\textbf{x}_i^{\mathsf{T}}\mathsf{E}z_{ik}\right)^{-1} \quad \textbf{m}_k = \beta\textbf{B}_k\left(\sum_{i=1}^{m}\textbf{x}_i\left(P_i-b_k\right)\mathsf{E}z_{ik} \right). \eqno(10)$$
+тогда с учетом (9) и (10), получаем:
+$$q(\textbf{w}_k) = N(\textbf{w}_k|\textbf{m}_k, \textbf{B}_k). \eqno(11)$$
+$$\log q(\textbf{Z}) = \mathsf{E}_{q/Z}\log p(\textbf{p}, \textbf{W}, \bm{\pi}, \textbf{Z}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) \propto$$
+$$\propto \sum_{i=1}^{m}\sum_{k=1}^{K} z_{ik}\left(\mathsf{E}_{\pi}\log\pi_k-\frac{\beta}{2}\left[P_i-b_k-\textbf{w}_k^{\mathsf{T}}\textbf{x}_i\right]^2 + \frac{1}{2}\left[\log\beta - \log2\pi\right]\right) =$$
+$$=  \sum_{i=1}^{m}\sum_{k=1}^{K}z_{ik}\left(\mathsf{E}\log\pi_k - \frac{\beta}{2}\left[\left(P_i-b_k\right)^2 -2\left(P_i-b_k\right)\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k +\textbf{x}_i^{\mathsf{T}}\left(\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}\right)\textbf{x}_i\right]\right) \Rightarrow$$
+$$\Rightarrow p(z_{ik} = 1) =  C\exp\left(\mathsf{E}\log\pi_k - \frac{\beta}{2}\left[\left(P_i-b_k\right)^2 -2\left(P_i-b_k\right)\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k +\textbf{x}_i^{\mathsf{T}}\left(\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}\right)\textbf{x}_i\right] \right). \eqno(12)$$
+
+Теперь нужно найти константу $C$. Учтем, что $\sum_k p(z_{ik}=1) = 1$, тогда получаем, что:
+$$p(z_{ik} = 1) =  \frac{\exp\left(\mathsf{E}\log\pi_k - \frac{\beta}{2}\left[\left(P_i-b_k\right)^2 -2\left(P_i-b_k\right)\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k +\textbf{x}_i^{\mathsf{T}}\left(\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}\right)\textbf{x}_i\right] \right)}{\sum_k p(z_{ik}=1)}. \eqno(13)$$.
+
+Теперь сделаем $M$-шаг:
+$$\mathsf{E}_{q(\bm{\pi}, \textbf{W}, \textbf{Z})} \log p(\textbf{p}, \textbf{W}, \bm{\pi}, \textbf{Z}|\textbf{X}, \textbf{A}, \textbf{b}, \beta, \mu) = \mathcal{F}(\textbf{A}, \textbf{b}, \beta) \propto $$
+$$ \propto\sum_{k=1}^{K}\left[ \left(\mu+2\gamma_k - 1\right)\mathsf{E}\log\pi_k +\frac{1}{2}\log\det\textbf{A}_k^{-1} -\frac{1}{2}\mathsf{E}\textbf{w}_k^{\mathsf{T}}\textbf{A}_{k}^{-1}\textbf{w}_k\right] +$$
+$$+ \sum_{k=1}^{K}\left[ \sum_{i=1}^{m}\mathsf{E}z_{ik}\left(\mathsf{E}\log\pi_k + \log\beta - \log2\pi -\frac{\beta}{2}\mathsf{E}\left(P_i - b_k - \textbf{w}_k^{\mathsf{T}}\textbf{x}_i\right)^2\right)\right]. \eqno(14)$$
+
+$$\frac{\partial\mathcal{F}}{\partial\textbf{A}_k^{-1}} = \frac{1}{2}\textbf{A}_k -\frac{1}{2}\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}} = \textbf{0}\Rightarrow \textbf{A}_k^{new} = \text{diag}(\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}), \eqno(15)$$
+
+$$\frac{\partial\mathcal{F}}{\partial b_k} = \sum_{i=1}^{m}\mathsf{E}z_{ik}\left(P_i-b_k -\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k\right) = 0 \Rightarrow  b_k^{new}  = \frac{1}{S_k}\sum_{i=1}^{m}P_i\mathsf{E}z_{ik} -\frac{1}{S_k}\sum_{i=1}^{m}\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k\mathsf{E}z_{ik}, \eqno(16)$$
+где введено обозначение:
+$$S_k = \sum_{i=1}^{m}\mathsf{E}z_{ik}. \eqno(17)$$
+
+$$\frac{\partial \mathcal{F}}{\partial \beta} = \sum_{k=1}^{K}\sum_{i=1}^{m}\left(\frac{1}{\beta}\mathsf{E}z_{ik} - \frac{1}{2}\mathsf{E}z_{ik}\left[\left(P_i-b_k\right)^2 -2\left(P_i-b_k\right)\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k+\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}\textbf{x}_i\right]\right) = 0 \Rightarrow$$
+$$\Rightarrow \frac{1}{\beta^{new}} = \frac{\sum\sum\left[\left(P_i-b_k\right)^2 -2\left(P_i-b_k\right)\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k+\textbf{x}_i^{\mathsf{T}}\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}}\textbf{x}_i\right]\mathsf{E}z_{ik}}{\sum\sum \mathsf{E}z_{ik}}. \eqno(18)$$
+
+Выпишем чему равны, все нужные нам матожидания:
+$$\mathsf{E}z_{ik} = p(z_{ik} = 1).\eqno(19)$$
+$$\mathsf{E}\log\pi_{k} = \psi^{0}(\mu + \gamma_k) - \psi^{0}(K\mu + m).\eqno(20)$$
+$$\mathsf{E}\textbf{w}_k\textbf{w}_k^{\mathsf{T}} = \textbf{B}_k + \textbf{m}_k\textbf{m}_k^{\mathsf{T}}.\eqno(21)$$
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+

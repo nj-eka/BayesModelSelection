@@ -1,0 +1,86 @@
+\documentclass[12pt, twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\newcommand{\hdir}{.}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{euscript}
+\usepackage{upgreek}
+\usepackage{array}
+\usepackage{theorem}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{url}
+\usepackage{amsmath}
+
+\usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm, bindingoffset=0cm]{geometry}
+
+\newcommand{\Pb}{\mathcal{P}}
+
+\setcounter{secnumdepth}{-1}
+
+\begin{document} 
+
+\title{Задание 2 по курсу "Байесовский выбор модели"}
+\date{}
+\maketitle
+\begin{center}
+{\LARGE Гадаев Тамаз (группа 574),\par
+Грабовой Андрей (группа 574),\par
+Малиновский Григорий (группа 574),\par
+Рогозина Анна (группа 574), \par
+Шульгин Егор (группа 574), \par
+}
+\end{center}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+	Метод&Весс на класс 1& Весс на класс 2\\
+	\hline
+	AUC &  0.5 & 0.5 \\
+	\hline
+	NUM & 0.5 & 0.5\\
+	\hline
+	ASY1& 0.95 & 0.05 \\
+	\hline
+	ASY2& 0.60 & 0.4 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Таблица важности(новая)}
+\label{table1}
+\end{table}
+\section{Исправления(общие)}
+1. Исправлена таблица важности(для ASY1 и для ASY2), новая важность объекта показана в табл.~\ref{table1}
+2. Добавлен тест шапиро, для обоснования использования наивного байесового классификатора(о том что прищзнаки распределены нормально). Добавлено нахождение попарной корреляции признаков.
+3. Изменена система oversamplinga. Теперь мы обучаемся на произвольных сбалансированных подвыборках и после этого смешиваем обученные модели(голосование моделей устраиваем). Этот метод имеет название Метод случайных сбалансированных подмножеств, который описан в работе~\cite{work1}
+
+\section{Задача 1}
+\section{Задача 2}
+\section{Задача 3}
+\section{Задача 4}
+\section{Задача 5}
+\section{Задача 6}
+\section{Задача 7}
+\section{Задача 8}
+\section{Задача 9}
+\section{Задача 10}
+\section{Задача 11}
+\section{Задача 12}
+\section{Задача 13}
+\section{Задача 14}
+
+\begin{thebibliography}{1}
+\bibitem{work1}
+    \emph{Никулин В. Н., Канищев И. С., Багаев И. В.}
+    МЕТОДЫ БАЛАНСИРОВКИ И НОРМАЛИЗАЦИИ ДАННЫХ ДЛЯ УЛУЧШЕНИЯ КАЧЕСТВА КЛАССИФИКАЦИИ~//
+   Компьютерные инструменты в образовании, No 3, 2016.~--- p.\,16–24.
+    \url{https://link.springer.com/article/10.1134/S000511791808009X}.
+\end{thebibliography}
+\end{document} 
